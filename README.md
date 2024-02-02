@@ -1,4 +1,8 @@
-# Moeru's empires
+# Moeru's Empires
 
-The place of the discord bot Empires of the moeru's squad.
-To use the bot, you need to have discord.py and the token of your bot.
+[ Project Empires Alpha ]
+
+## Readme languages
+
+> [English](https://github.com/MOERUYONAKI/Moeru-s-Empires/blob/main/readme/readme-en.md)  
+> [Français](https://github.com/MOERUYONAKI/Moeru-s-Empires/blob/main/readme/readme-fr.md)  

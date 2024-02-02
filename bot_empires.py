@@ -8,13 +8,14 @@ import discord.__main__ as discord
 from random import *
 from Moeru_modules.kingdoms import *
 from Moeru_modules.empire import Moerus_kd
+from Moeru_modules.rolls import *
 from discord.__main__ import *
 from discord.ext import commands
 from discord.ext.commands.bot import Bot
 from discord.ext.commands import has_permissions
 
 
-# - - - - - S C R I P T _ P R I N C I P A L - - - - -
+# - - - - - S C R I P T   P R I N C I P A L - - - - -
 
 
 intents = discord.Intents.all()
@@ -24,12 +25,14 @@ bot = commands.Bot(command_prefix = '!', description = 'kingdoms maker', intents
 
 empires = {}
 
+
 # - - - - - - - - - - - - - - - - - - - - 
+
 
 @bot.command(name = 'new_empire')
 async def emp_create(ctx, * , names : str):
     if ctx.message.author.name not in empires.keys():
-        empires[ctx.message.author.name] = Kingdom(names)
+        empires[ctx.message.author.name] = Kingdom(name = names, cities = [])
         print(f'{ctx.message.author.name} crée un empire')
         await ctx.send(embed = discord.Embed(title = 'Nouvel empire', description = f'Vous venez de créer votre empire au nom de **{names}** !', color=0x00ffff))
 
@@ -48,12 +51,20 @@ async def city_create(ctx, * , names : str):
         await ctx.send(f"Vous ne possédez pas d'empire")
 
 @bot.command(name = 'show_empire')
-async def empire_view(ctx):
-    if ctx.message.author.name in empires.keys():
-        await ctx.send(embed = discord.Embed(title = f"{ctx.message.author.name}'s empire", description = f'{empires[ctx.message.author.name].show_cities()}', color=0x00ffff))
+async def empire_view(ctx, member : discord.Member = None):
+    if member == None:
+        if ctx.message.author.name in empires.keys():
+            await ctx.send(embed = discord.Embed(title = f"{ctx.message.author.name}'s kingdom", description = f'{empires[ctx.message.author.name].show_cities()}', color=0x00ffff))
 
+        else:
+            await ctx.send(f"Vous ne possédez pas d'empire")
+            
     else:
-        await ctx.send(f"Vous ne possédez pas d'empire")
+        if member.name in empires.keys():
+            await ctx.send(embed = discord.Embed(title = f"{member.name}'s empire", description = f'{empires[member.name].show_cities()}', color=0x00ffff))
+
+        else:
+            await ctx.send(f"Cet utilisateur ne possède pas d'empire")
 
 @bot.command(name = 'lvl_upgrade')
 async def up_city(ctx, * , name : str):
@@ -91,7 +102,40 @@ async def gold_and_troops(ctx):
         await ctx.send(f"Vous ne possédez pas d'empire")  
 
 
+# - - -  T E S T I N G  - - - 
+
+
+@bot.command(name = 'roll')
+async def katsu_roll(ctx, msg): # Here for tests
+    roll = Katsu_roll(msg)
+    if type(roll) is list:
+        cmd = ''
+        if roll[0][3] != None:
+            for elt in roll[0]:
+                cmd += str(elt)
+                
+        else:
+            for elt in roll[0][0 : 3]:
+                cmd += str(elt)
+        
+        results = 0
+        rolls = ""
+        for i in range(len(roll[1])):
+            results += roll[1][i][1]
+            if i == 0:
+                rolls += str(roll[1][i][0])
+            
+            else:
+                rolls += ", " + str(roll[1][i][0])
+            
+        await ctx.send(f'```# {results}\nDétails : {cmd} ({rolls})```')
+            
+    else:
+        await ctx.send(roll)
+
+
 # - - - - - - - - - - - - - - - - - - - - 
+
 
 @bot.event
 async def on_ready() :
@@ -103,10 +147,14 @@ async def on_ready() :
 
 # - Sécurisation du Token -
 try:
-    token = open("C:\\Users\\1bbor\\OneDrive\\Documents\\GitHub\\Tokens.txt", 'r')
+    token = open('C:\\Users\\1bbor\\Documents\\GitHub\\Tokens.txt', 'r')
     
 except:
-    token = open("C:\\Users\\lduma\\Desktop\\developement\\dev\\Tokens.txt", 'r')
+    try:
+        token = open("C:\\Users\\lduma\\Desktop\\developement\\dev\\Tokens.txt", 'r')
+        
+    except:
+        token = open("C:\\DocBot\\Tokens.txt", 'r')
     
 TOKEN = token.readline()
 bot.run(TOKEN)
